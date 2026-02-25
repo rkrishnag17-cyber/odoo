@@ -1,0 +1,28 @@
+# Use the official Odoo image as a base – adjust the version as needed
+FROM odoo:16.0
+
+# Install additional system dependencies if you need (example: nano, git, etc.)
+RUN apt-get update && apt-get install -y \
+    nano \
+    git \
+    && rm -rf /var/lib/apt/lists/*
+
+# Copy custom addons (if present)
+# Adjust the source path as needed
+COPY ./addons /mnt/extra-addons
+
+# If you have a custom odoo.conf, copy it
+# COPY ./odoo.conf /etc/odoo/odoo.conf
+
+# Set permissions (if needed)
+RUN chown -R odoo:odoo /mnt/extra-addons
+
+# Expose default Odoo port
+EXPOSE 8069
+
+# CMD is inherited from odoo image. If you need to override:
+# CMD ["odoo"]
+
+# Healthcheck (optional)
+HEALTHCHECK --interval=30s --timeout=5s --start-period=30s --retries=3 \
+  CMD curl -f http://localhost:8069 || exit 1
